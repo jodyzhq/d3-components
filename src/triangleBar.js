@@ -12,7 +12,9 @@ define(function(require){
    */
   require('lodash')
   require('d3')
+  var $ = require('jquery')
   var linearGradient1 = ''
+  var linearGradient2 = ''
 
   var triangleBar = {
     defaultSetting: function() {
@@ -26,6 +28,10 @@ define(function(require){
           color: ['#b3ff03', '#54a707'],
           borderColor: '#de2528',
           borderWidth: 1,
+          emphasis: {  //强调样式
+            color: ['#b3ff03', '#54a707'],
+            borderColor: '#de2528'
+          },
           circle:{
             color:'#fff',
             r: 3,
@@ -66,7 +72,8 @@ define(function(require){
       }
 
       //定义一个线性渐变     
-        _slef.Gradient(svg, color) 
+        _slef.Gradient(svg, color, 'linearColor') 
+        
        //定义y轴标尺
       var yScale = d3.scale.linear()
         .domain([0, d3.max(dataset)])
@@ -111,7 +118,8 @@ define(function(require){
         var dLen = dataset.length
         var dwidth = (width - cfg.grid.x - itemStyle.barWidth)/dLen
         var barWidth = itemStyle.barWidth
-  
+        var emphasis = itemStyle.emphasis
+        
         var group =  svg.selectAll(".group")
            .data(dataset)
            .enter()
@@ -122,6 +130,7 @@ define(function(require){
               var y = height - cfg.grid.y
               return 'translate('+x+', '+y+')'
            })
+
 
         group.append('polygon')  
           .attr('points', function(d, i){
@@ -134,13 +143,51 @@ define(function(require){
             var p3 = p1
             var points = ''+p1+', '+p2+'  '+(p1-barWidth)+',  '+p3+' '+(p1+barWidth)+' '+p3+' '
             return points
-             return points
           })
         .attr("fill", function(d,i){
           return 'url(#' + linearGradient1.attr('id') + ')'
         })
         .attr('stroke-width', itemStyle.borderWidth)
         .attr('stroke', itemStyle.borderColor)
+        //添加提示框
+        .on('mouseenter', function(d, i){
+          d3.select(this).style('cursor', 'pointer')
+          var txt = '<p>'+data[i].name+'<br /></p><p>数量：'+data[i].value+'</p>'
+          var tooltip = d3.select('body')
+            .append('div')
+            .attr('class', 'tooltip')
+            .html(txt)
+          var height = $('.tooltip').height()
+          var width = $('.tooltip').width()
+          var top = event.offsetY - height - height/2
+          var left = event.offsetX - width/2
+          tooltip
+            .style('top', top+'px')
+            .style('left', left+'px')
+
+          //改变颜色
+          var color = emphasis.color
+          _slef.Gradient(svg, color, 'linearColor2')     
+            d3.select(this)
+            .attr("fill", function(d,i){
+              return 'url(#' + linearGradient1.attr('id') + ')'
+            })
+            .attr('stroke', emphasis.borderColor)
+         })
+         //鼠标移开 
+         .on('mouseleave', function(){
+            var color = cfg.itemStyle.color
+            _slef.Gradient(svg, color, 'linearColor') 
+
+            d3.select(this) 
+            .attr("fill", function(d,i){
+              return 'url(#' + linearGradient1.attr('id') + ')'
+            })
+            .attr('stroke', itemStyle.borderColor)
+            d3.selectAll('.tooltip').remove()
+            d3.selectAll('.linearColor2').remove()
+
+         })
 
         //添加上面小圆圈
         group.append('circle')
@@ -154,7 +201,6 @@ define(function(require){
             if(cy==0){
               cy = itemStyle.min
             }
-
             return -cy
           })
           .attr('fill', itemStyle.circle.color) 
@@ -168,7 +214,7 @@ define(function(require){
           .text(function(d,i){
             return dataX[i]
           })
-          .style('transform','rotate(45deg)')
+          .attr('transform','rotate(45)')
           .attr('x', function(d,i){
             var x = xText.margin.left
             return x 
@@ -176,26 +222,24 @@ define(function(require){
           .attr('y', function(d,i){
             var y = xText.margin.top
             return y 
-
           })
-          
-     
     },
     //定义线性渐变
-    Gradient: function(svg, color){
+    Gradient: function(svg, color, id){
       var a = d3.hcl(color[0])
       var b = d3.hcl(color[1])
-      var defs = svg.append("defs");
+      var defs = svg.append("defs")
+        .attr('class', id)
       //添加渐变色
      linearGradient1 = defs.append("linearGradient")
-          .attr("id","linearColor")
+          .attr("id", id)
           .attr("x1","0%")
-          .attr("y1","20%")
+          .attr("y1","60%")
           .attr("x2","0%")
-          .attr("y2","10%");
+          .attr("y2","60%")
   
       var stop1 = linearGradient1.append("stop")
-              .attr("offset","0%")
+              .attr("offset","100%")
               .style("stop-color",a.toString());
       
       var stop2 = linearGradient1.append("stop")
@@ -203,6 +247,7 @@ define(function(require){
               .style("stop-color",b.toString());     
 
     }
+
 
 
   }

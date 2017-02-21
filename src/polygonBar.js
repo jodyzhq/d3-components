@@ -10,6 +10,7 @@ define(function(require) {
    */
   require('lodash')
   require('d3')
+  var $ = require('jquery')
 
   var polygonBar = {
     /**
@@ -24,13 +25,14 @@ define(function(require) {
         min: 1,
         zoom: 8,
         color: ['#d63200', '#9936e8'],
-        //coordinate: [130,20, 20,40, 20,220, 130,200, 220,220, 220,40] , //六边形的六个坐标点
-        coordinate: [60,20, 20,90, 60,160, 140,160, 180,90, 140,20], //正六边形的六个坐标点
+        coordinate: ['130,20, 20,40, 20,220, 130,200, 220,220, 220,40', '60,20, 20,90, 60,160, 140,160, 180,90, 140,20'] , //正六边形的六个坐标点
+        pointStyle: 1,
         itemStyle:{
           strokeWidth: 1,
           stroke: '#06b7c7',
           margin: {
-            left: 18
+            left: 0,
+            bottom:8,
           }
         },
         xText: {
@@ -49,6 +51,7 @@ define(function(require) {
         },
         grid: {  //文字离左右两边的距离
           x: 50,
+          x2: 20,
           y: 45
         }
       }
@@ -100,14 +103,21 @@ define(function(require) {
        exit.remove()
 
       //定义一个线性渐变
-      var color = config.color
-      var a = d3.hcl(color[0]);    
-      var b = d3.hcl(color[1]);    
-      var compute = d3.interpolate(a,b); 
+      var color = config.itemStyle.color
+      var emphasis = config.itemStyle.emphasis.color
+      
+      
+      colorFill(color)
+      //渐变色填充
+      function colorFill(color){
+        var a = d3.hcl(color[0]);    
+        var b = d3.hcl(color[1]);    
+        compute = d3.interpolate(a,b); 
+      }
+      //填充比例尺
       var linear = d3.scale.linear()  
-            .domain([0, max])  
-            .range([0, 1.5])
-        
+          .domain([0, max])  
+          .range([0, 1.5])
       //定义y轴标尺
       var yScale = d3.scale.linear()
         .domain([0, d3.max(dataset)])
@@ -127,9 +137,7 @@ define(function(require) {
       }
       //添加六边形的area
       var itemStyle = config.itemStyle
-
       var spacing  = (width - config.grid.x - polygonW)/dataLen
-      console.log(spacing)
       var areas = enter.append('g')
         .attr('transform',function(d,i){
           i++
@@ -137,6 +145,38 @@ define(function(require) {
           return 'translate('+x+', '+(height-config.grid.y)+')'
         })
         .attr('class', 'areas')
+        .on('mouseenter', function(d, i){
+          var $this = d3.select(this)
+          $this.style('cursor', 'pointer')
+          var txt = '<p>'+data[i].name+'<br /></p><p>数量：'+data[i].value+'</p>'
+          var tooltip = d3.select('body')
+            .append('div')
+            .attr('class', 'tooltip')
+            .html(txt)
+          var height = $('.tooltip').height()
+          var width = $('.tooltip').width()
+          var top = event.offsetY - height - height/2
+          var left = event.offsetX - width/2
+          tooltip
+            .style('top', top+'px')
+            .style('left', left+'px')
+
+          colorFill(emphasis) //调用颜色
+          $this.selectAll('.polygon')
+            .style("fill",function(d){  
+              return compute(linear(d)) 
+          })
+        })
+        .on('mouseleave', function(){
+          var $this = d3.select(this)
+          d3.selectAll('.tooltip').remove()
+          //渐变色填充
+          colorFill(color)
+          $this.selectAll('.polygon')
+            .style("fill",function(d){  
+              return compute(linear(d)) 
+          })
+        })
 
         var unit = Math.floor(d3.max(dataset) / max)
 

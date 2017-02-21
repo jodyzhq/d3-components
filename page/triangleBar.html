@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>triangleBar</title>
+  <meta charset="utf-8">
+  <title>triangleBar测试</title>
   <style type="text/css">
-    body{
-        margin: 0;
+    *{
+         margin: 0;
         padding: 0;
+      }
+    body{
+       
         background: #040931;
         font-family: "微软雅黑";
-        }
+      }
         /*轴线*/
         .axis path,
         .axis line{
@@ -26,6 +30,16 @@
           stroke: #285c81;
           shape-rendering: crispEdges;
           opacity: 0.5;
+        }
+        .tooltip{
+          position: absolute;
+          background: rgba(0, 0, 0, 0.3);
+          color: #fff;
+          padding: 8px;
+          /*display: none;*/
+        }
+        .tooltip p{
+          line-height: 24px;
         }
 
   </style>
@@ -79,13 +93,17 @@
                   color: ['#b3ff03', '#54a707'],
                   borderColor: '#de2528',
                   borderWidth: 1,
+                  min: 20,
                   margin:{
                     left:10
                   },
-                  min: 20,
                   circle:{
                     color:'#fff',
                     r: 3,
+                  },
+                  emphasis: {  //强调样式
+                    color: ['#c9ff4c', '#c9ff4c'],
+                    borderColor: '#c9ff4c'
                   }
                 },
                 xText:{
@@ -106,7 +124,7 @@
                   y2:40
                 }
             }
-            var svg = d3.select('body')
+            var svg = d3.select('#triangleBar')
                 .append("svg")
                 .attr("width", width)
                 .attr("height", height)

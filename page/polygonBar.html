@@ -1,34 +1,46 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta http-equiv="content-type" content="text/html;charset=utf-8">
-	<title>polygonBar测试</title>
-  <style>
-    body{
-      margin: 0;
-      padding: 0;
-      background: #040931;
-      font-family: "微软雅黑";
-    }
-    /*轴线*/
-    .axis path,
-    .axis line{
-      fill: none;
-      stroke: #fff;
-      shape-rendering: crispEdges;
-    }
-    .axis text {
-      font-family: sans-serif;
-      font-size: 11px;
-      stroke: #fff;
-    }
-    .inner_line path, .inner_line line{
-      fill: none;
-      stroke: #285c81;
-      shape-rendering: crispEdges;
-      opacity: 0.5;
-    }
-  </style>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<title>polygonBar测试</title>
+<style>
+*{
+  margin: 0;
+  padding: 0;
+}
+body{
+  background: #040931;
+  font-family: "微软雅黑";
+}
+/*轴线*/
+.axis path,
+.axis line{
+  fill: none;
+  stroke: #fff;
+  shape-rendering: crispEdges;
+}
+.axis text {
+  font-family: sans-serif;
+  font-size: 11px;
+  stroke: #fff;
+}
+.inner_line path, .inner_line line{
+  fill: none;
+  stroke: #285c81;
+  shape-rendering: crispEdges;
+  opacity: 0.5;
+}
+.tooltip{
+  position: absolute;
+  background: rgba(0, 0, 0, 0.3);
+  color: #fff;
+  padding: 8px;
+  /*display: none;*/
+}
+.tooltip p{
+  line-height: 24px;
+}
+</style>
 </head>
 <body id="body">
     <script type="text/javascript" src="../lib/sea.js" ></script>
@@ -59,15 +71,20 @@
                 height: height,
                 min: 1,
                 zoom: 8,
-                color: ['#d63200', '#9936e8'],
+                
                 coordinate: ['130,20, 20,40, 20,220, 130,200, 220,220, 220,40', '60,20, 20,90, 60,160, 140,160, 180,90, 140,20'] , //正六边形的六个坐标点
                 pointStyle: 1,
                 itemStyle:{
                   strokeWidth: 1,
                   stroke: '#06b7c7',
+                  color: ['#d63200', '#9936e8'],
                   margin: {
                     left: 0,
                     bottom:8,
+                  },
+                  emphasis: {  //强调样式
+                    color: ['#c9ff4c', '#d63200'],
+                    borderColor: '#c9ff4c'
                   }
                 },
                 xText: {
