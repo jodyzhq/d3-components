@@ -56,12 +56,17 @@ define(function(require) {
         }
       }
     },
+
     /**
      * 绘制柱状图
+     * @param {object} svg svg对象
+     * @param {object} data 数据
+     * @param {object} config 图表配置项
      */
     drawPolygonBar: function(svg, data, opt) {
       var config = _.assign({}, this.defaultSetting(), opt)
       var dataset = []
+      var id = config.id
       for(var i = 0, len = data.length; i<len; i++){
         dataset.push(data[i].value)
       }
@@ -101,12 +106,11 @@ define(function(require) {
 
       //处理exit部分
        exit.remove()
-
-      //定义一个线性渐变
+       //默认颜色
       var color = config.itemStyle.color
+      //高亮颜色
       var emphasis = config.itemStyle.emphasis.color
-      
-      
+      //调用渐变色
       colorFill(color)
       //渐变色填充
       function colorFill(color){
@@ -149,14 +153,15 @@ define(function(require) {
           var $this = d3.select(this)
           $this.style('cursor', 'pointer')
           var txt = '<p>'+data[i].name+'<br /></p><p>数量：'+data[i].value+'</p>'
-          var tooltip = d3.select('body')
+          //添加提示框
+          var tooltip = d3.select(id)
             .append('div')
             .attr('class', 'tooltip')
             .html(txt)
           var height = $('.tooltip').height()
           var width = $('.tooltip').width()
-          var top = event.offsetY - height - height/2
-          var left = event.offsetX - width/2
+          var top = event.y - height - height/2
+          var left = event.x - width/2
           tooltip
             .style('top', top+'px')
             .style('left', left+'px')

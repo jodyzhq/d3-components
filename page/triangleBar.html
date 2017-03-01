@@ -45,7 +45,7 @@
   </style>
 </head>
 <body>
-<div id="triangleBar"></div>
+<div id="triangleBar" style="margin-left: 60px;"></div>
  <script type="text/javascript" src="../lib/sea.js" ></script>
   <script type="text/javascript" src="../config.js" ></script>
   <script type="text/javascript">
@@ -57,7 +57,7 @@
             var data = [
               {
                 name: "江北区",
-                value: 140
+                value: 1140
               },{
                 name: "渝北区",
                 value: 100
@@ -88,6 +88,7 @@
             var config = {
                 width: width,
                 height: height,
+                id: '#triangleBar',
                 itemStyle: {
                   barWidth: 6,
                   color: ['#b3ff03', '#54a707'],
@@ -112,7 +113,7 @@
                   textAnchor: 'start',
                   margin:{
                     top: 15,
-                    left: 0
+                    left: 0 //反方向 -20
                   }
                 },
                 xAxis: {

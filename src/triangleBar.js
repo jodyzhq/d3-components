@@ -62,6 +62,7 @@ define(function(require){
       var cfg = _.assign({}, this.defaultSetting(), opt)
       var width = cfg.width
       var height = cfg.height
+      var id = cfg.id
       var color = cfg.itemStyle.color
       var _slef = this
       var dataset = []
@@ -121,7 +122,7 @@ define(function(require){
         var emphasis = itemStyle.emphasis
         
         var group =  svg.selectAll(".group")
-           .data(dataset)
+           .data(data)
            .enter()
            .append('g')
            .attr('class', 'group')
@@ -135,13 +136,14 @@ define(function(require){
         group.append('polygon')  
           .attr('points', function(d, i){
             var p1 = -1
-            console.log(linear(d)  )
-            var p2 = -linear(d)  
+
+            var p2 = -linear(d.value)  
             if(p2==0){
               p2 = -itemStyle.min
             }
             var p3 = p1
             var points = ''+p1+', '+p2+'  '+(p1-barWidth)+',  '+p3+' '+(p1+barWidth)+' '+p3+' '
+            console.log(points)
             return points
           })
         .attr("fill", function(d,i){
@@ -153,14 +155,15 @@ define(function(require){
         .on('mouseenter', function(d, i){
           d3.select(this).style('cursor', 'pointer')
           var txt = '<p>'+data[i].name+'<br /></p><p>数量：'+data[i].value+'</p>'
-          var tooltip = d3.select('body')
+          var tooltip = d3.select(id)
             .append('div')
             .attr('class', 'tooltip')
             .html(txt)
           var height = $('.tooltip').height()
           var width = $('.tooltip').width()
-          var top = event.offsetY - height - height/2
-          var left = event.offsetX - width/2
+         
+          var top = event.y - height - height/2
+          var left = event.x - width/2
           tooltip
             .style('top', top+'px')
             .style('left', left+'px')
@@ -197,7 +200,7 @@ define(function(require){
             return -1
           })
           .attr('cy', function(d,i){
-            var cy =   linear(d) 
+            var cy =   linear(d.value) 
             if(cy==0){
               cy = itemStyle.min
             }
@@ -207,22 +210,40 @@ define(function(require){
 
         var xText = cfg.xText  
         console.log(xText.fontSize)
-        group.append('text')
+      var textx = group.append('text')
           .attr('fill', xText.color)
           .attr('font-size', xText.fontSize)
           .attr('text-anchor', xText.textAnchor)
           .text(function(d,i){
             return dataX[i]
           })
-          .attr('transform','rotate(45)')
+        // .attr('transform','rotate(40 0,40)')
+         .attr('transform','rotate(45)')
           .attr('x', function(d,i){
-            var x = xText.margin.left
+            var x = 0
             return x 
           })
           .attr('y', function(d,i){
-            var y = xText.margin.top
+            var y = (xText.margin.top )
             return y 
           })
+          //.style('writing-mode','tb-rl')
+
+
+          textx.selectAll("tspan")  
+           .data(function(d,i){
+            console.log(d.name)
+            var tspandata = d.name.split('\n')
+            console.log(tspandata)
+            return tspandata
+           })  
+           .enter()  
+           .append("tspan")  
+           .attr("x",textx.attr("x"))  
+           .attr("dy","1em")  
+           .text(function(d,k){ 
+                return d
+           }) 
     },
     //定义线性渐变
     Gradient: function(svg, color, id){

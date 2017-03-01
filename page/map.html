@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>map测试</title>
+  <style>
+  body{
+    margin: 0;
+    padding: 0;
+    background: #040931;
+    font-family: "微软雅黑";
+  }
+  .tooltip{
+    position: absolute;
+    background:#021649;
+    color: #fff;
+    left: 30px;
+    top: 30px;
+    padding: 10px;
+    border-radius: 5px;
+    border:1px solid #eee;
+  }
+  .back{
+    position: absolute;
+    left: 800px;
+    color: #fff;
+    color: #fff;
+    padding: 10px;
+    cursor: pointer;
+    display: none;
+  }
+  </style>
+</head>
+<body >
+  <div id="map">
+    <div class="back">返回</div>
+  </div>
+  <script type="text/javascript" src="../lib/sea.js" ></script>
+  <script type="text/javascript" src="../config.js" ></script>
+  <script type="text/javascript">
+
+      seajs.use(['../src/map'], function(map) {
+        var width = 800
+        var height = 600
+
+        var config = {
+          width: width,
+          height: height,
+          id: 'map',
+          area: 'chongqing',
+          itemStyle: {
+            fill: '#001e5a',
+            stroke: '#2fb9f8',
+            strokeWidth: 1,
+            emphasis: {
+              fill: '#04184b',
+              stroke: '#2fb9f8',
+              strokeWidth: 1
+            },
+            filters: {
+              opacity: 0.4,
+              fill: ['#023ac0', '#0232af'],
+              stroke: '#011a53',
+              strokeWidth: 2
+            }
+          },
+          markPoint: {   
+            symbol: 'circle', //circle, image
+            fill: '#16b0f8',
+            radius: 10
+          },
+          tooltip: {
+            className: 'tooltip'
+          }
+        }
+        var data = [
+          {
+            "name": "云阳县",
+            "geoCoord": [108.83034075456257, 31.009656231968137]
+          },{
+            "name": "巫山县",
+            "geoCoord": [109.83034075456257, 31.009656231968137]
+          },{
+            "name": "合川区",
+            "geoCoord": [106.10834075456257, 30.119656231968137]
+          }
+        ]
+        var svg = d3.select('#map')
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .style('padding', '20px')
+
+        map.init(svg, data, config)
+
+        
+      })
+
+  </script>
+</body>
+</html>
