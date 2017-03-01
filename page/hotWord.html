@@ -5,158 +5,91 @@
   <title>热词</title>
   <style type="text/css">
   body{
-    background: #081d43;
+    background: #040931;
     font-family: '微软雅黑'
   }
   /* tagscloud */
-#tagscloud {
-  position: absolute;
-  font-size: 12px;
-  color: #333;
-  text-align: center;
-  width: 90%;
-  height: 650px;
-  top: 95px;
-  overflow: hidden;
-  padding: 5%;
-}
-
-#tagscloud a {
-  text-decoration: none;
-  line-height: 18px;
-  text-align: center;
-  font-size: 16px;
-  display: inline-block;
-  cursor: pointer;
-  opacity: 0.1;
-  position: absolute;
-  top: 100%;  
-}
-
-#tagscloud a.tagc1 {
-  color: #fff;
-  font-size: 20px;
- 
-  left: 100px;
-  
-}
-#tagscloud a.tagc2 {
-  color: #00b3ce;
- 
- font-size: 18px;
- left: 220px;
- top: 750px;
-
-
-}
-#tagscloud a.tagc3 {
- color: #f33b50;
- left: 300px;
- font-size: 18px;
-}
-
-
-
-#tagscloud a.tagc1:hover{
-  color: #fff;
-}
-#tagscloud a.tagc2:hover {
-  color: #00b3ce;
-}
-#tagscloud a.tagc3:hover {
-  color: #f33b50;
-}
-
-
-#tagscloud a.scale{
-   animation:scale 7s infinite linear;
-  -webkit-animation:scale 7s infinite linear; /*Safari and Chrome*/
-  -webkit-backface-visibility:hidden
-}
-
-#tagscloud a.scale2{
-   animation:scale2 10s infinite linear;
-  -webkit-animation:scale2 10s infinite linear; /*Safari and Chrome*/
-  -webkit-backface-visibility:hidden
-}
-#tagscloud a.stop{
-  opacity: 1;
-  transform:scale(1.2) /*translate3d(0, -25%,0)*/;
-  /*-webkit-backface-visibility:hidden*/
-}
-
-@keyframes scale
-{
-  0%{
-    opacity: 0.1;
-    transform:scale(0.2) /*translate3d(0%,0,0)*/;
+  #tagscloud {
+      width:550px;
+      height:660px;
+      position:relative;
+      font-size:12px;
+      color:#333;
+      margin:20px auto 0;
+      text-align:center;
+      padding: 20px;
   }
-  20% {
-    opacity: 0.5;
-    transform:scale(0.8) /*translate3d(0%, -20%,0)*/;
+  #tagscloud a {
+    position:absolute;
+    top:0px;
+    left:0px;
+    color:#333;
+    text-decoration:none;
+    margin:0 10px 15px 0;
+    line-height:18px;
+    text-align:center;
+    font-size:24px;
+    padding:5px;
+    display:inline-block;
+    cursor: pointer;
   }
-  60%{
-    opacity: 1;
-    transform:scale(1.2) /*translate3d(0%, -60%,0)*/;
+  #tagscloud a.tagc1 {
+    color:#f33b50;
   }
-  80%{
-    opacity: 0.5;
-    transform:scale(0.8) /*translate3d(0%, -80%,0)*/;
+  #tagscloud a.tagc2 {
+    color:#fff;
   }
-  100% {
-    opacity: 0.1;
-    transform:scale(0.2) /*translate3d(0%, -80%,0)*/;
-     /*top: 100px;*/
-     /*left: 200px;*/
+  #tagscloud a.tagc3 {  
+    color:#71b7ff;
   }
-}
-
-@keyframes scale2
-{
-  0%{
-    opacity: 0.1;
-    transform:scale(0.2) /*translate3d(0%,0,0)*/;
+  #tagscloud a:hover {
+      color:#fff;
+      background:#0099ff;
   }
-  25% {
-    opacity: 0.5;
-    transform:scale(0.8) /*translate3d(0%, -25%,0)*/;
-  }
-  50%{
-    opacity: 1;
-    transform:scale(1.2) /*translate3d(0%, -50%,0)*/;
-  }
-
-  75%{
-    opacity: 0.5;
-    transform:scale(0.8) /*translate3d(0, -75%,0)*/;
-  }
-  100% {
-    opacity: 0.1;
-    transform:scale(0.2) /*translate3d(0, -75%,0)*/;
-    
-    /*top: 120px;
-    left: 900px;*/
-  }
-}
   </style>
 </head>
 <body>
 
-<div id="tagscloud"></div>
+<div id="tagscloud">
+  <a class="tagc3">采取</a>
+  <a class="tagc1">追尾追尾</a>
+  <a class="tagc1">醉酒</a>
+  <a class="tagc2">闹事</a>
+  <a class="tagc1">被盗</a>
+  <a class="tagc3">群体</a>
+  <a class="tagc1">纠纷</a>
+  <a class="tagc1">相撞</a>
+  <a class="tagc1">摩托车</a>
+  <a class="tagc1">扰民</a>
+  <a class="tagc2">打架</a>
+  <a class="tagc3">下步</a>
+  <a class="tagc3">采取</a>
+  <a class="tagc1">追尾</a>
+  <a class="tagc1">醉酒</a>
+  <a class="tagc1">闹事</a>
+  <a class="tagc1">被盗</a>
+  <a class="tagc3">群体</a>
+  <a class="tagc1">纠纷</a>
+  <a class="tagc1">相撞</a>
+  <a class="tagc1">摩托车</a>
+  <a class="tagc1">扰民</a>
+  <a class="tagc1">打架</a>
+  <a class="tagc3">下步</a>
+</div>
 <script type="text/javascript" src='../lib/jquery.min.js'></script>
 <script type="text/javascript" src="../lib/sea.js" ></script>
 <script type="text/javascript" src="../config.js" ></script>
 <script type="text/javascript">
-  var data = []
-  var id = '#tagscloud'
-  var dataUrl = '../data/hotWord.json'
-
-  $.get(dataUrl, function(res){
-    data = res.data.results
-  })
   
+
   seajs.use(['../src/hotWord'], function(hotWord) {
-    hotWord.init(data, id)
+    var id = 'tagscloud'
+    var config = {
+      radius: 200,
+      speed: 190
+    }
+
+    hotWord.init(id, config)
   })
 </script>
 </body>

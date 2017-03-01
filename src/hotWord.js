@@ -10,140 +10,187 @@ define(function(require){
 
   
   /**
-  * 引入公用的文件
-  */
+   * 引入公用的文件
+   */
+
   require('lodash')
-  var $ = require('jquery')
-  var ALLDATA = []
-  var domW = 0
-  var domH = 0
-  var tags = {}
-  var cfg = {
-    size: 42  //字体大小（随机数0——1*size）
-  }
+
+  var radius = 0; //半径
+  var d = 200;
+  var dtr = 0 //速度
+  var mcList = [];
+  var lasta = 1;
+  var lastb = 1;
+  var distr = true;
+  var tspeed = 11;
+  var size = 200;
+  var mouseX = 0;
+  var mouseY = 20; //控制速度
+  var howElliptical = 1;
+  var aA = null;
+  var oDiv = null;
+
 
   var hotWord = {
-
-
     /**
-     *  [renderData 渲染数据]
-     *  @param     {[object]}    data [热词数据]
-     *  @param     {[string]}    id   [容器id]
+     * 热词默认配置项
      */
-    renderData: function(data, id){
+    defaultSetting: function(){
+      return {
+        radius: 200,
+        speed: 190
+      }
+    },
+
+    init: function(id, opt){
       var _self = this
-      console.log(data)
-      ALLDATA = data
-      //打乱顺序，随机显示颜色
-      data.sort(function(a, b) {
-        return a.name < b.name
-      })
-      domW = Math.ceil($(id).width()) //热词容器的宽
-      domH = Math.ceil($(id).height()) //热词容器的高
-      console.log(domW, domH)
+      var i=0;
+      var cfg = _.assign({}, this.defaultSetting(), opt)
+      //配置项
+      radius = cfg.radius
+      dtr = Math.PI / cfg.speed;
+      mcList = []
+      var oTag=null;
+      oDiv=document.getElementById(id);
+      aA=oDiv.getElementsByTagName('a');
 
-      var hotWords = ''
-      for(var i=0, len = data.length; i<len; i++){
-        var words = data[i].name
-        var source = parseInt(data[i].ssbFlag)
-        console.log(source)
-        var str = ''
-        //判断类型，添加不同的颜色
-        switch(source){
-          case 1:
-            str = '<a class="tagc1" type='+source+'>'+words+'</a>'
-            break;
-          case 2:
-            str = '<a class="tagc3" type='+source+'>'+words+'</a>'
-            break;
-          case 3:
-            str = '<a class="tagc2" type='+source+'>'+words+'</a>'
-            break;
-        } 
-        hotWords += str
+      for(i=0;i<aA.length;i++){
+        oTag={};    
+        aA[i].onmouseover = (function (obj) {
+          return function () {
+            obj.on = true;
+            this.style.zIndex = 99;
+            this.style.padding = '10px';
+            this.style.filter = 'alpha(opacity=100)';
+            this.style.opacity = 1;
+          }
+        })(oTag)
+        aA[i].onmouseout = (function (obj) {
+          return function () {
+            obj.on = false;
+            this.style.zIndex = obj.zIndex;
+
+           // this.style.color = '#fff';
+            this.style.padding = '5px';
+            this.style.filter = 'alpha(opacity=" + 100 * obj.alpha + ")';
+            this.style.opacity = obj.alpha;
+            this.style.zIndex = obj.zIndex;
+          }
+        })(oTag)
+
+        oTag.offsetWidth = aA[i].offsetWidth;
+        oTag.offsetHeight = aA[i].offsetHeight;
+        mcList.push(oTag);
       }
-      $(id).html(hotWords)
-      tags = $(document).find(''+id+' a')
-      //热词数量太少调整调用时间
-      if(data.length<=40){
-        if (window.navigator.userAgent.indexOf("MSIE")>=1) {
-          _self.setTimes(cfg, 1000)
-        }else{
-          _self.setTimes(cfg, 1000)
-        } 
-      }else{
-        //判断ie
-        if (window.navigator.userAgent.indexOf("MSIE")>=1) {
-          _self.setTimes(cfg, 100)
-        }else{
-          _self.setTimes(cfg, 300)
-        } 
-      }
-      _self.bindEvent(id)
+      _self.sineCosine( 0, 0, 0 );
+      _self.positionAll();
+       
+      (function () {
+         _self.update();
+         setTimeout(arguments.callee, 40);
+      })();
+
+      
     },
 
-    setTimes: function(cfg, time){
-      setTime = setInterval(function(){
-        var len = Math.floor(Math.random() * ALLDATA.length)
-
-        var size = Math.floor(Math.random() * cfg.size)
-        var top = Math.floor(Math.random() * domH)
-
-        var left = Math.floor(Math.random() * domW) 
-        console.log('top', top, 'domH', 'domH', 'left', left, 'domW',  domW)
-          if(size<12 && size > 6){
-            size = size * 5
-          }
-          if(size<6){
-            size = size * 8
-          }
-          // tags.eq(len).addClass('scale2')
-          // tags.eq(len+1).addClass('scale2')
-          var hasClass = tags.hasClass('scale')
-          if(hasClass){
-            tags.eq(len+1).addClass('scale2')
-          }else{
-            tags.eq(len).addClass('scale')
-          }
-          var hasClass2 = tags.hasClass('scale2')
-          if(hasClass2){
-            tags.eq(len).addClass('scale')
-          }else{
-            tags.eq(len+1).addClass('scale2')
-          }
-          tags.eq(len).css({'top': top+'px', 'left': left+'px', 'font-size': size+'px'})
-
-      },time)
-    },
-
-    //事件绑定
-    bindEvent: function(id){
-      $(id).on('mouseenter', 'a', function(e){
-        var $this = $(this)
-        stopAnima($this)
-        
-      })
-      $(id).on('mouseleave', 'a', function(e){
-        var $this = $(this) 
-        setInterval(function(){
-          $this.addClass('scale')
-        }, 1500)
-      })
-
-      //停止动画 animation
-      function stopAnima(cur){
-        cur.removeClass('scale')
-        cur.removeClass('scale2')
-        cur.addClass('stop')
-      }
-    },
-
-    init: function(data, id){
+    update: function(){
       var _self = this
-      console.log(data)
-      _self.renderData(data, id)
+      var a, b, c = 0;
+      a = (Math.min(Math.max(-mouseY, -size), size) / radius) * tspeed;
+      b = (-Math.min(Math.max(-mouseX, -size), size) / radius) * tspeed;
+      lasta = a;
+      lastb = b;
+      if (Math.abs(a) <= 0.01 && Math.abs(b) <= 0.01) {
+          return;
+      }
+      _self.sineCosine(a, b, c);
+      for (var i = 0; i < mcList.length; i++) {
+          if (mcList[i].on) {
+              continue;
+          }
+          var rx1 = mcList[i].cx;
+          var ry1 = mcList[i].cy * ca + mcList[i].cz * (-sa);
+          var rz1 = mcList[i].cy * sa + mcList[i].cz * ca;
+
+          var rx2 = rx1 * cb + rz1 * sb;
+          var ry2 = ry1;
+          var rz2 = rx1 * (-sb) + rz1 * cb;
+
+          var rx3 = rx2 * cc + ry2 * (-sc);
+          var ry3 = rx2 * sc + ry2 * cc;
+          var rz3 = rz2;
+
+          mcList[i].cx = rx3;
+          mcList[i].cy = ry3;
+          mcList[i].cz = rz3;
+
+          per = d / (d + rz3);
+
+          mcList[i].x = (howElliptical * rx3 * per) - (howElliptical * 2);
+          mcList[i].y = ry3 * per;
+          mcList[i].scale = per;
+          var alpha = per;
+          alpha = (alpha - 0.6) * (10 / 6);
+          mcList[i].alpha = alpha * alpha * alpha - 0.2;
+          mcList[i].zIndex = Math.ceil(1 - Math.floor(mcList[i].cz));
+      }
+        _self.doPosition();
+    },
+
+    positionAll: function(){
+      var phi = 0;
+      var theta = 0;
+      var max = mcList.length;
+      console.log('max', max)
+      for (var i = 0; i < max; i++) {
+          if (distr) {
+              phi = Math.acos(-1 + (2 * (i + 1) - 1) / max);
+              theta = Math.sqrt(max * Math.PI) * phi;
+          } else {
+              phi = Math.random() * (Math.PI);
+              theta = Math.random() * (2 * Math.PI);
+          }
+          //坐标变换
+          mcList[i].cx = radius * Math.cos(theta) * Math.sin(phi);
+          mcList[i].cy = radius * Math.sin(theta) * Math.sin(phi);
+          mcList[i].cz = radius * Math.cos(phi);
+          aA[i].style.left = mcList[i].cx + oDiv.offsetWidth / 0.2 - mcList[i].offsetWidth / 0.2 + 'px';
+          aA[i].style.top = mcList[i].cy + oDiv.offsetHeight / 0.2 - mcList[i].offsetHeight / 0.2 + 'px';
+      }
+    },
+    doPosition: function(){
+      var l = oDiv.offsetWidth / 2;
+      var t = oDiv.offsetHeight / 2;
+            
+      for (var i = 0; i < mcList.length; i++) {
+        if (mcList[i].on) {
+            continue;
+        }
+        var aAs = aA[i].style;
+        if (mcList[i].alpha > 0.1) {
+            if (aAs.display != '')
+                aAs.display = '';
+        } else {
+            if (aAs.display != 'none')
+                aAs.display = 'none';
+            continue;
+        }
+        aAs.left = mcList[i].cx + l - mcList[i].offsetWidth / 2 + 'px';
+        aAs.top = mcList[i].cy + t - mcList[i].offsetHeight / 2 + 'px';
+        aAs.filter = "alpha(opacity=" + 100 * mcList[i].alpha + ")";
+        aAs.zIndex = mcList[i].zIndex;
+        aAs.opacity = mcList[i].alpha;
+      }
+    },
+    
+    sineCosine: function(a, b, c){
+      sa = Math.sin(a * dtr);
+      ca = Math.cos(a * dtr);
+      sb = Math.sin(b * dtr);
+      cb = Math.cos(b * dtr);
+      sc = Math.sin(c * dtr);
+      cc = Math.cos(c * dtr);
     }
-
   }
 
   return hotWord

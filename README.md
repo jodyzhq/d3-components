@@ -26,6 +26,8 @@
 - polarCoordinates zhanghq
 - gradientBar zhanghq
 - relationChart zhanghq
+- hotWord zhanghq
+- map zhanghq
 
 
 ## 参考资料
