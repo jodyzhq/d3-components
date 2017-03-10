@@ -15,6 +15,7 @@ define(function(require) {
   require('d3')
   require('lodash')
   require('topojson')
+  var $ = require('jquery')
 
   //配置项
   var width = 0
@@ -50,10 +51,13 @@ define(function(require) {
           }
         },
         markPoint: {   
-          symbol: 'circle', //circle, image
+          symbol: 'image', //circle, image
           fill: '#16b0f8',
+          imgUrl: '../doc/img/icon2.png',
+          imgUrl2: '../doc/img/icon1.png',
+          width: 22,
+          height: 22,
           radius: 10
-
         },
         tooltip: {
           className: 'tooltip'
@@ -62,7 +66,7 @@ define(function(require) {
  
     },
      /**
-     * 地图初始化
+     * @describe [地图初始化] 
      * @param {object} svg svg对象
      * @param {object} data 数据
      * @param {object} config 图表配置项
@@ -80,7 +84,7 @@ define(function(require) {
     },
 
     /**
-     * 绘制地图
+     * @describe [绘制地图] 
      * @param {string} mapUrl svg对象
      * @param {object} markData 标注点数据
      * @param {object} svg svg对象
@@ -98,6 +102,7 @@ define(function(require) {
        // var root = topojson.feature(toporoot, toporoot.objects.chongqing)
 
         var features = root.features
+       
         //控制地图缩放的大小
         var scale = _self.getZoomScale(features, width, height),
             center = _self.getCenters(features);
@@ -184,12 +189,13 @@ define(function(require) {
 
 
     /**
-     * 地图打点
+     * @describe [地图打点]
      * @param {function} projection 计算点位置的一个算法
      * @param {Object} markData 点的经纬度数据
      * @param {Object} markData 容器id
      */
     markPoint: function(projection, markData, id){
+      var _self = this
       //标注点配置
       var markCfg = cfg.markPoint
       //标注点
@@ -202,26 +208,154 @@ define(function(require) {
       //添加点
       var symbol = markCfg.symbol
 
-      if(symbol=='circle'){
-        markPoint.selectAll('.circle')
+      // if(symbol=='circle'){
+      //   markPoint.selectAll('.circle')
+      //   .data(markData)
+      //   .enter()
+      //   .append('circle')
+      //   .attr('fill', markCfg.fill)
+      //   .attr('r', markCfg.radius)
+      //   .attr("cx", function(d){
+      //     var coor = projection(d.geoCoord)
+      //     return coor[0]
+      //   })
+      //   .attr("cy",function(d){
+      //     var coor = projection(d.geoCoord)
+      //     return coor[1]
+      //   })
+      // }
+      var addPoints =  markPoint.selectAll('.image')
         .data(markData)
         .enter()
-        .append('circle')
-        .attr('fill', markCfg.fill)
-        .attr('r', markCfg.radius)
-        .attr("cx", function(d){
+        .append('image')
+        .attr("x", function(d){
           var coor = projection(d.geoCoord)
           return coor[0]
         })
-        .attr("cy",function(d){
+        .attr("y",function(d){
           var coor = projection(d.geoCoord)
           return coor[1]
         })
+        .on('mouseover', function(d, i){
+          d3.select(this).style('cursor', 'pointer')
+          clearInterval(timing)
+          addPoint(i)
+        })
+        .on('mouseout', function(d, i){
+           carousel()
+        })
+
+      var t = 0
+      var total = 3
+      var time = 0
+      addPoint(t)
+
+      /**
+       *  @describe [战果快报轮播]
+       *  @return   {[type]}   [description]
+       */
+      var timing 
+      function carousel(){
+         timing = setInterval(function(){
+        t++
+        addPoint(t)
+        if( t == total){
+          t = 0
+          addPoint(t)
+        }
+        },4000)
       }
+      carousel()
+     
+      /**
+       *  @describe [添加点]
+       *  @param    {[number]}   num [当前点添加动画]
+       */
+      function addPoint(num){
+        addPoints
+          .attr('href', function(d, i){
+          var $this = d3.select(this)
+          var href = markCfg.imgUrl
+          if(i==num){
+            href = markCfg.imgUrl2
+            var left = $this.attr('x') - 140
+            var top = $this.attr('y') - 30
+            popupPosition(left, top)
+            _self.drawLine()
+          }
+          return href
+        })
+        .attr('width', markCfg.width)
+        .attr('height', markCfg.height)
+        
+        .style('opacity', function(d,i){
+          var $this = d3.select(this)
+          var settime = setInterval(function(d,i){
+            $this
+            .style('opacity', 0.5)
+            .transition()
+            .duration(500)
+            .style('opacity', 1)
+          },1000)
+        })
+      }
+
+ 
+      /**
+       *  @describe [弹窗的位置]
+       *  @param    {[number]}   left [距离left的位置]
+       *  @param    {[number]}   top  [距离top的位置]
+       */
+      function popupPosition(left, top){
+        // $('.popup-main').fadeOut(100)
+        // $('.popup-main').fadeIn(200)
+        d3.select('.popup-main')
+          .style('left', left+'px')
+          .style('top', top+'px')
+      }  
     },
 
+
+
     /**
-     * 点击返回
+     *  @describe [线条动画]
+     */
+    drawLine: function(){
+      d3.selectAll('.line').remove()
+      var svg = d3.select('.popup-main')
+       var line =  svg.append('svg')
+          .attr('class', 'line')
+
+       line.append('path')
+        .attr('stroke', '#3b9eff')
+        .attr('fill', 'none')
+        .attr('stroke-width', 2)
+        .attr('d', 'M300 200 M300 200 ')
+        .transition()
+        .duration(2000)
+
+        .attr('d', 'M300 200 L175 200 ')
+        .transition()
+        .duration(2000)
+      
+        .attr('d', 'M300 200 L175 200 L115 55')
+
+        // 显示弹窗
+        $('.popup-content').fadeOut(200);
+        setTimeout(function(){
+          $('.popup-content').fadeIn("slow")
+        },2000)
+
+        // setTimeout(function(){
+        //   d3.select('.popup-main').style('display', 'none')
+        // },8000)
+
+    },
+
+
+    /**
+     *  @describe [点击返回]
+     *  @param    {[object]}   svg [svg容器]
      */
     clickBack: function(svg){
       var _self = this
@@ -235,7 +369,7 @@ define(function(require) {
     },
 
     /**
-     * 给地图添加滤镜效果
+     * @describe [给地图添加滤镜效果]
      * @param {Object} mapSvg 存放地图的svg容器
      * @param {Object} features 地图各区域块的数据
      * @param {function} path 取得或设置地理投影,D3的一个方法函数

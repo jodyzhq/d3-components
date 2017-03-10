@@ -29,15 +29,49 @@
     cursor: pointer;
     display: none;
   }
+  
   h5{
     color: #fff;
   }
+  .popup-main{
+    position: absolute;
+    color: #fff;
+    left: 265px;
+    top: 8px;
+  }
+  .popup-content{
+    display: none;
+    border:1px solid #3b9eff;
+    padding: 10px;
+    position: absolute;
+    width: 200px;
+    border-radius: 5px;
+    text-align: center;
+    margin-top: 10px;
+    background: rgba(255, 255, 255, 0.3);
+  }
+  .line{
+    position: absolute;
+    width: 300px;
+    height: 205px;
+  }
+  .main{
+    padding: 10%;
+    position: relative;
+  }
   </style>
 </head>
-<body >
-  <h5>该demo需要启服务才能查看效果</h5>
-  <div id="map">
-    <div class="back">返回</div>
+<body>
+  <div class="main">
+    <div class="popup-main">
+      <div class="popup-content">
+        提示信息
+      </div>
+    </div>
+
+    <div id="map">
+      <div class="back">返回</div>
+    </div>
   </div>
   <script type="text/javascript" src="../lib/sea.js" ></script>
   <script type="text/javascript" src="../config.js" ></script>
@@ -69,8 +103,12 @@
             }
           },
           markPoint: {   
-            symbol: 'circle', //circle, image
+            symbol: 'image', //circle, image
             fill: '#16b0f8',
+            imgUrl: '../doc/img/icon2.png',
+            imgUrl2: '../doc/img/icon1.png',
+            width: 22,
+            height: 22,
             radius: 10
           },
           tooltip: {
@@ -83,10 +121,14 @@
             "geoCoord": [108.83034075456257, 31.009656231968137]
           },{
             "name": "巫山县",
-            "geoCoord": [109.83034075456257, 31.009656231968137]
+            "geoCoord": [109.83034075456257, 31.109656231968137]
           },{
             "name": "合川区",
-            "geoCoord": [106.10834075456257, 30.119656231968137]
+            "geoCoord": [106.12834075456257, 30.119656231968137]
+          },{
+            "name": "涪陵区",
+            "geoCoord": [107.419811,29.708925]
+            
           }
         ]
         var svg = d3.select('#map')
